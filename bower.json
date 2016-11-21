@@ -1,0 +1,25 @@
+{
+  "name": "movie_web",
+  "description": "movie app",
+  "main": "app.js",
+  "authors": [
+    "sasa"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "movie_key"
+  ],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/libs",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}

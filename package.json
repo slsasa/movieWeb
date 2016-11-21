@@ -1,0 +1,26 @@
+{
+  "name": "movie_web",
+  "version": "1.0.0",
+  "description": "movie app",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.14.0",
+    "jade": "^1.11.0",
+    "moment": "^2.16.0",
+    "mongoose": "^4.6.8"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-concurrent": "^2.3.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-nodemon": "^0.4.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "movie_key"
+  ],
+  "author": "sasa",
+  "license": "MIT"
+}
