@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 
         watch: {
             jade: {
-                files: ['views/**'],
+                files: ['views/**/*.jade'],
                 options: {
                     livereload: true
                 }
