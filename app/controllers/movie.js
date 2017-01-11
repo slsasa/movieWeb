@@ -163,14 +163,20 @@ exports.del = function (req, res) {
 
 
     if (id) {
-        Movie.remove({_id: id}, function (err) {
-            if (err) {
-                console.log(err)
-            }
+        Movie.findById(id,function (err, movie) {
+            var categoryId = movie.category
+            Category.update({_id: categoryId}, {$pull: {'movies': id}}, function (err) {
+                if (err) {console.log(err)}
+                Movie.remove({_id: id}, function (err) {
+                    if (err) {
+                        console.log(err)
+                    }
 
+                    res.redirect('/admin/movie/list')  //重定向页面
 
-                res.redirect('/admin/list')  //重定向页面
-
+                })
+            })
         })
+
     }
 }
