@@ -74,97 +74,96 @@ exports.isSave = function (req, res) {
 
     if (id) {
         Movie.findById(id, function (err, movie) {
-            if (err) {
-                console.log(err)
-            }
-
-
             var oldCategoryId = movie.category
-            if (oldCategoryId && newCategoryId !== oldCategoryId) {
-                Category.update({_id: oldCategoryId}, {$pull: {'movies': movie._id}}, function (err) {
-                    console.log(err)
-                    _movie = _.extend(movie, movieObj)
-                    _movie.save(function (err, movie) {
-                        if (err) {
-                            console.log(err)
-                        }
+            
+            if (err) {console.log(err)}
 
-                        Category
-                            .findById(newCategoryId, function (err, category) {
-                                category.movies.push(movie)
-                                category.save(function (err) {
-                                    if (err) {
-                                        console.log(err)
-                                    }
+            Category.findOne({$or:[{_id:newCategoryId},{'name':categoryName}]}, function (err, category) {
+                if (err) {console.log(err)}
+                if (category._id !== oldCategoryId) {
+                    Category.update({_id:oldCategoryId},{$pull:{'movies':movie._id}},
+                    function (err) {
+                        if (err) {console.log(err)}
 
-                                    res.redirect('/movie/' + movie._id)
-                                })
-                            })
+                        _movie = _.extend(movie, movieObj)
+                        _movie.save(function (err,movie) {
 
-                    })
+                            if (err) {console.log(err)}
 
+                            category.movies.push(movie)
+                            category.save(function (err) {
+                                if (err) {console.log(err)}
 
-                })
-            }
-            else if (categoryName) {
-                Category.findOne({'name':categoryName}, function (err, category) {
-                    if (categoryName !== category.name) {
-                        var category = new Category({
-                            name: categoryName,
-                            movies: [movie._id]
-                        })
-
-                        category.save(function(err, category) {
-                            movie.category = category._id
-                            movie.save(function(err, movie) {
                                 res.redirect('/movie/' + movie._id)
                             })
                         })
-                    }
-                })
 
-            }
 
+                    })
+                }
+                else {
+                    var category = new Category({
+                        name: categoryName,
+                        movies: []
+                    })
+
+
+                    category.save(function (err, category) {
+                        _movie.category = category._id
+                        _movie.save(function (err, movie) {
+                            category.movies.push(movie)
+                            category.save(function (err) {
+                                console.log(err)
+                                res.redirect('/movie/' + movie._id)
+                            })
+
+                        })
+                    })
+                }
+            })
+
+            
         })
+
     }
     else {
         _movie = new Movie(movieObj)
 
-        var categoryId = movieObj.category
+        Category.findOne({$or:[{_id:newCategoryId},{'name':categoryName}]}, function (err , category) {
+            if (category) {
 
-        _movie.save(function (err, movie) {
-            if (err) {
-                console.log(err)
-            }
-            if (categoryId) {
-                Category.findById(categoryId, function (err, category) {
+                    _movie.category = category._id
+                    _movie.save(function (err, movie) {
+                        category.movies.push(movie)
+                        category.save(function (err) {
 
-                    category.movies.push(movie._id)
-
-                    category.save(function (err) {
-                        if (err) {
-                            console.log(err)
-                        }
-                        res.redirect('/movie/' + movie._id)  //重定向页面
+                            res.redirect('/movie/' + movie._id)
+                        })
                     })
-                })
 
-            }
-            else if (categoryName) {
-                var category = new Category({
-                    name: categoryName,
-                    movies: [movie._id]
-                })
+                }
+                else {
 
-                category.save(function(err, category) {
-                    movie.category = category._id
-                    movie.save(function(err, movie) {
-                        res.redirect('/movie/' + movie._id)
+                    var category = new Category({
+                        name: categoryName,
+                        movies: []
                     })
-                })
-            }
 
+
+                    category.save(function (err, category) {
+                        _movie.category = category._id
+                        _movie.save(function (err, movie) {
+                            category.movies.push(movie)
+                            category.save(function (err) {
+                                console.log(err)
+                                res.redirect('/movie/' + movie._id)
+                            })
+
+                        })
+                    })
+                }
         })
+
     }
 }
 
@@ -179,6 +178,7 @@ exports.list = function (req, res) {
             if (err) {
                 console.log(err)
             }
+
             res.render('list', {
                 title: '列表页',
                 movies: movies

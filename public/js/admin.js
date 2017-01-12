@@ -42,30 +42,14 @@ $(function() {
 		}
 	})
 
-	// $('#douban').blur(function() {
-	// 	if (id) {
-	// 		var douban = $(this)
-	// 		var id = douban.val()
-    //
-	// 		$.ajax({
-	// 			url: 'https://api.douban.com/v2/movie/subject/' + id,
-	// 			cache: true,
-	// 			type: 'get',
-	// 			dataType: 'jsonp',
-	// 			crossDomain: true,
-	// 			jsonp: 'callback',
-	// 			success: function (data) {
-	// 				$('#inputTitle').val(data.title)
-	// 				$('#inputDoctor').val(data.directors[0].name)
-	// 				$('#inputCategory').val(data.genres[0])
-	// 				$('#inputCountry').val(data.countries[0])
-	// 				$('#inputPoster').val(data.images.large)
-	// 				$('#inputYear').val(data.year)
-	// 				$('#inputSummary').val(data.summary)
-	// 			}
-	// 		})
-	// 	}
-	// })
+	var $radio = $("input[type='radio']:checked");//获取选中的选项
+	var val = $radio.val();//获取选中的选项的值value
+	if (val.length > 0) {
+
+		$('#inputCategory').attr({
+			type: 'hidden'
+		})
+	}
 })
 
 
