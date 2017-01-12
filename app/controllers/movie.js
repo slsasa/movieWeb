@@ -69,6 +69,7 @@ exports.isSave = function (req, res) {
     var id = req.body.movie._id
     var movieObj = req.body.movie
     var newCategoryId = movieObj.category
+    var categoryName = movieObj.categoryName
     var _movie
 
     if (id) {
@@ -79,7 +80,7 @@ exports.isSave = function (req, res) {
 
 
             var oldCategoryId = movie.category
-            if (newCategoryId !== oldCategoryId) {
+            if (oldCategoryId && newCategoryId !== oldCategoryId) {
                 Category.update({_id: oldCategoryId}, {$pull: {'movies': movie._id}}, function (err) {
                     console.log(err)
                     _movie = _.extend(movie, movieObj)
@@ -105,7 +106,24 @@ exports.isSave = function (req, res) {
 
                 })
             }
+            else if (categoryName) {
+                Category.findOne({'name':categoryName}, function (err, category) {
+                    if (categoryName !== category.name) {
+                        var category = new Category({
+                            name: categoryName,
+                            movies: [movie._id]
+                        })
 
+                        category.save(function(err, category) {
+                            movie.category = category._id
+                            movie.save(function(err, movie) {
+                                res.redirect('/movie/' + movie._id)
+                            })
+                        })
+                    }
+                })
+
+            }
 
         })
     }
@@ -123,7 +141,7 @@ exports.isSave = function (req, res) {
 
                     category.movies.push(movie._id)
 
-                    category.save(function (err, categories) {
+                    category.save(function (err) {
                         if (err) {
                             console.log(err)
                         }
@@ -131,6 +149,19 @@ exports.isSave = function (req, res) {
                     })
                 })
 
+            }
+            else if (categoryName) {
+                var category = new Category({
+                    name: categoryName,
+                    movies: [movie._id]
+                })
+
+                category.save(function(err, category) {
+                    movie.category = category._id
+                    movie.save(function(err, movie) {
+                        res.redirect('/movie/' + movie._id)
+                    })
+                })
             }
 
         })

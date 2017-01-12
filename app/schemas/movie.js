@@ -15,6 +15,7 @@ var MovieSchema = new Schema({
 	doctor: String,
 	title: String,
 	language: String,
+	poster: String,
 	country: String,
 	summary: String,
 	flash: String,
