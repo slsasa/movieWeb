@@ -7,6 +7,7 @@ var Category = require('../models/category')
 var _ = require('underscore')
 
 
+
 // detail page
 exports.detail = function (req, res) {
     var id = req.params.id
@@ -63,6 +64,8 @@ exports.update = function (req, res) {
 
     }
 }
+
+
 
 //admin post movie ,movie save
 exports.isSave = function (req, res) {

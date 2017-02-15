@@ -6,7 +6,8 @@ block content
 			each category in categories
 				.panel.panel-primary
 					.panel-heading
-						.panel-title #{category.name}
+						.panel-title
+							a(href="/search?cate=#{category._id}&p=0") #{category.name}
 					.panel-body
 						if category.movies && category.movies.length >0
 							each item in category.movies
@@ -15,5 +16,5 @@ block content
 										a(href="/movie/#{item._id}")
 											img(src="#{item.poster}",alt="#{item.title}")
 										.caption
-											h4 #{item.title}
+											h5 #{item.title}
 											p: a.btn.btn-primary(href="/movie/#{item._id}",role="button") 观看预告片

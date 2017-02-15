@@ -53,12 +53,6 @@ MovieSchema.statics = {
 		return this
 			.findOne({_id: id})
 			.exec(cb)
-	},
-	findByName: function (name,cb) {
-		return this
-			.findOne({'name': name})
-			.exec(cb)
-		
 	}
 }
 

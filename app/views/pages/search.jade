@@ -1,0 +1,28 @@
+extends ../layout
+
+block content
+    .container
+        .row
+            .panel.panel-default
+                .panel-heading
+                    h4 #{categoryName}
+                .panel-body
+                        each movie in movies
+                            .col-sm-2
+                                .thumbnail
+                                    a(href="/movie/#{movie._id}")
+                                        img(src="#{movie.poster}", alt="#{movie.title}")
+                                        .caption
+                                            h4 #{movie.title}
+                                            p: a.btn.btn-primary(href="/movie/#{movie._id}", role='button') 观看预告
+            ul.pagination
+                - for (var i = 0; i < totalPage; i++) {
+                    - if (currentPage == (i+1) ) {
+                        li.active
+                            span #{currentPage}
+                    - }
+                    - else {
+                        li
+                            a(href="/search?#{query}&p=#{i}") #{i+1}
+                    - }
+                - }
