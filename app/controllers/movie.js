@@ -1,12 +1,16 @@
 /**
  * Created by sasa on 16/11/30.
  */
-var Movie = require('../models/movie')
-var Comment = require('../models/comment')
-var Category = require('../models/category')
-var _ = require('underscore')
+let Movie = require('../models/movie')
+let Comment = require('../models/comment')
+let Category = require('../models/category')
+let Async = require('async')
+let Multiparty = require('connect-multiparty')
+let fs = require('fs')
+let path = require('path')
+let _ = require('underscore')
 
-
+let MultipartyMiddleware = Multiparty()
 
 // detail page
 exports.detail = function (req, res) {
@@ -66,13 +70,14 @@ exports.update = function (req, res) {
 }
 
 
-
+// todo buff_path 保存用户上传的文件的缓冲.
 //admin post movie ,movie save
 exports.isSave = function (req, res) {
-    var id = req.body.movie._id
-    var movieObj = req.body.movie
-    var newCategoryId = movieObj.category
-    var categoryName = movieObj.categoryName
+    var body = req.body
+    var id = body['movie._id']
+    var movieObj = body['movie']
+    var newCategoryId = movieObj['category']
+    var categoryName = movieObj['categoryName']
     var _movie
 
     if (id) {

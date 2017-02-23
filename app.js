@@ -43,4 +43,3 @@ require('./config/routes')(app)
 app.use(express.static(path.join(__dirname, 'public')))
 app.locals.moment = require('moment')
 app.listen(port)
-
