@@ -1,6 +1,4 @@
-/**
- * Created by sasa on 16/11/30.
- */
+
 //signup
 var User = require('../models/user')
 

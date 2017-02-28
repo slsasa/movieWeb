@@ -3,6 +3,9 @@ var User = require('../app/controllers/user')
 var Movie = require('../app/controllers/movie')
 var Comment = require('../app/controllers/comment')
 var Category = require('../app/controllers/category')
+var Multiparty = require('connect-multiparty');
+
+var MultipartyMiddleware = Multiparty();
 
 module.exports = function (app) {
 

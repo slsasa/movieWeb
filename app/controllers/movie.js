@@ -1,16 +1,13 @@
-/**
- * Created by sasa on 16/11/30.
- */
-let Movie = require('../models/movie')
-let Comment = require('../models/comment')
-let Category = require('../models/category')
-let Async = require('async')
-let Multiparty = require('connect-multiparty')
-let fs = require('fs')
-let path = require('path')
-let _ = require('underscore')
+var Movie = require('../models/movie')
+var Comment = require('../models/comment')
+var Category = require('../models/category')
+var Async = require('async')
+var Multiparty = require('connect-multiparty')
+var fs = require('fs')
+var path = require('path')
+var _ = require('underscore')
 
-let MultipartyMiddleware = Multiparty()
+var MultipartyMiddleware = Multiparty()
 
 // detail page
 exports.detail = function (req, res) {
@@ -70,109 +67,127 @@ exports.update = function (req, res) {
 }
 
 
-// todo buff_path 保存用户上传的文件的缓冲.
 //admin post movie ,movie save
 exports.isSave = function (req, res) {
-    var body = req.body
-    var id = body['movie._id']
-    var movieObj = body['movie']
-    var newCategoryId = movieObj['category']
-    var categoryName = movieObj['categoryName']
+    var movieObj = req.body.movie
+    var id = movieObj._id
+    var newCategoryId = movieObj.category
+    var categoryName = movieObj.categoryName
     var _movie
+    var posterData = req.files.uploadPoster
+    var filePath = posterData.path
+    var originalFilename = posterData.originalFilename
 
-    if (id) {
-        Movie.findById(id, function (err, movie) {
-            var oldCategoryId = movie.category
-            
-            if (err) {console.log(err)}
+    Async.waterfall([
+        function (callback) {
+            if (originalFilename) {
+                fs.readFile(filePath, function(err, data) {
+                    var timestamp = Date.now()
+                    var type = posterData.type.split('/')[1]
+                    var poster = timestamp + '.' + type
+                    var newPath = path.join(__dirname, '../../', '/public/upload/' + poster)
 
-            Category.findOne({$or:[{_id:newCategoryId},{'name':categoryName}]}, function (err, category) {
-                if (err) {console.log(err)}
-                if (category._id !== oldCategoryId) {
-                    Category.update({_id:oldCategoryId},{$pull:{'movies':movie._id}},
-                    function (err) {
-                        if (err) {console.log(err)}
-
-                        _movie = _.extend(movie, movieObj)
-                        _movie.save(function (err,movie) {
-
-                            if (err) {console.log(err)}
-
-                            category.movies.push(movie)
-                            category.save(function (err) {
-                                if (err) {console.log(err)}
-
-                                res.redirect('/movie/' + movie._id)
-                            })
-                        })
-
-
+                    fs.writeFile(newPath, data, function(err) {
+                        req.poster = poster
+                        callback()
                     })
-                }
-                else {
-                    var category = new Category({
-                        name: categoryName,
-                        movies: []
-                    })
+                })
+            }
+            else {
+                callback()
+            }
 
+        },
+         function (callback) {
+            if(req.poster) {
+                movieObj.poster = req.poster
+            }
 
-                    category.save(function (err, category) {
+            callback()
+
+        },
+        function (callback) {
+            if (id) {
+                Movie.findById(id, function (err, movie) {
+                    var oldCategoryId = movie.category
+
+                    if (err) console.log(err)
+
+                    Category.findOne({$or: [{_id: newCategoryId}, {'name': categoryName}]},
+                        function (err, category) {
+                            if (err) console.log(err)
+
+                            if (category._id !== oldCategoryId) {
+                                Category.update({_id: oldCategoryId}, {$pull: {'movies': movie._id}},
+                                    function (err) {
+                                        if (err) {
+                                            console.log(err)
+                                        }
+
+                                        _movie = _.extend(movie, movieObj)
+                                        callback(null, _movie, category)
+                                    })
+                            }
+                            else {
+                                callback(null, _movie)
+                            }
+                        }
+                    )
+                })
+            }
+            else {
+
+                _movie = new Movie(movieObj)
+                Category.findOne({$or:[{_id:newCategoryId},{'name':categoryName}]}, function (err , category) {
+                    if (category) {
                         _movie.category = category._id
-                        _movie.save(function (err, movie) {
-                            category.movies.push(movie)
-                            category.save(function (err) {
-                                console.log(err)
-                                res.redirect('/movie/' + movie._id)
-                            })
+                        // console.log('_movie新建有category=======' + JSON.stringify(_movie))
+                        callback(null, _movie, category)
+                    }
+                    else {
 
-                        })
-                    })
-                }
-            })
+                        callback(null, _movie)
+                    }
+                })
 
-            
-        })
+            }
+        },
+        function (_movie,category) {
 
-    }
-    else {
-        _movie = new Movie(movieObj)
-
-        Category.findOne({$or:[{_id:newCategoryId},{'name':categoryName}]}, function (err , category) {
             if (category) {
-
+                _movie.save(function (err, movie) {
+                    if (err) {
+                        console.log(err)
+                    }
+                    category.movies.push(movie)
+                    category.save(function (err) {
+                        if (err) {
+                            console.log(err)
+                        }
+                        res.redirect('/movie/' + movie._id)
+                    })
+                })
+            }
+            else {
+                var category = new Category({
+                    name: categoryName,
+                    movies: []
+                })
+                category.save(function (err, category) {
                     _movie.category = category._id
                     _movie.save(function (err, movie) {
                         category.movies.push(movie)
                         category.save(function (err) {
-
+                            console.log(err)
                             res.redirect('/movie/' + movie._id)
                         })
                     })
-
-                }
-                else {
-
-                    var category = new Category({
-                        name: categoryName,
-                        movies: []
-                    })
+                })
+            }
+        }]
 
 
-                    category.save(function (err, category) {
-                        _movie.category = category._id
-                        _movie.save(function (err, movie) {
-                            category.movies.push(movie)
-                            category.save(function (err) {
-                                console.log(err)
-                                res.redirect('/movie/' + movie._id)
-                            })
-
-                        })
-                    })
-                }
-        })
-
-    }
+    )
 }
 
 

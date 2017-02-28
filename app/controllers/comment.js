@@ -1,6 +1,4 @@
-/**
- * Created by sasa on 16/12/4.
- */
+
 var Comment = require('../models/comment')
 
 exports.save = function (req, res) {

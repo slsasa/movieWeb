@@ -37,9 +37,10 @@ if ('development' === app.get('env')) {
 }
 
 
-
-
-require('./config/routes')(app)
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(bodyParser({uploadDir: './public/upload'}))
+require('./config/routes')(app)
+
+
 app.locals.moment = require('moment')
 app.listen(port)
