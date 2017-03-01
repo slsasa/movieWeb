@@ -46,9 +46,9 @@ module.exports = function(grunt) {
         }
     })
 
-    grunt.loadNpmTasks('grunt-contrib-watch') //加载插件 当文件更新，它会重新执行，在grunt内布置好的任务
-    grunt.loadNpmTasks('grunt-nodemon') //实时监听app.js app.js一更新，它会自动重启app.js
-    grunt.loadNpmTasks('grunt-concurrent') //优化构建时间
+    grunt.loadNpmTasks('grunt-contrib-watch')
+    grunt.loadNpmTasks('grunt-nodemon')
+    grunt.loadNpmTasks('grunt-concurrent')
 
     grunt.option('force',true) //预防语法错误，不会中断服务
     grunt.registerInitTask('default',['concurrent'])
