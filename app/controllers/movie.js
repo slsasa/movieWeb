@@ -7,27 +7,26 @@ var fs = require('fs')
 var path = require('path')
 var _ = require('underscore')
 
-var MultipartyMiddleware = Multiparty()
 
 // detail page
 exports.detail = function (req, res) {
     var id = req.params.id
-
-    Movie.findOne({_id:id})
-        .populate('category','name')
+    Movie.findOne({ _id: id })
+        .populate('category', 'name')
         .exec(function (err, movie) {
+
             Comment
-                    .find({movie:id})
-                    .populate('from', 'name')
-                    .populate('reply.from reply.to', 'name')
-                    .exec(function (err, comments) {
-                        console.log('comments' + comments)
-                        res.render('detail', {
-                            title: ' \t',
-                            movie: movie,
-                            comments: comments,
-                        })
+                .find({ movie: id })
+                .populate('from', 'name')
+                .populate('reply.from reply.to', 'name')
+                .exec(function (err, comments) {
+                    console.log('comments' + comments)
+                    res.render('detail', {
+                        title: ' \t',
+                        movie: movie,
+                        comments: comments,
                     })
+                })
         })
 
 }
@@ -70,24 +69,25 @@ exports.update = function (req, res) {
 //admin post movie ,movie save
 exports.isSave = function (req, res) {
     var movieObj = req.body.movie
-    var id = movieObj._id
+
+    var id = req.body.movie._id
     var newCategoryId = movieObj.category
     var categoryName = movieObj.categoryName
     var _movie
-    var posterData = req.files.uploadPoster
+    var posterData = req.files.uploadPoster || ''
     var filePath = posterData.path
     var originalFilename = posterData.originalFilename
 
     Async.waterfall([
         function (callback) {
             if (originalFilename) {
-                fs.readFile(filePath, function(err, data) {
+                fs.readFile(filePath, function (err, data) {
                     var timestamp = Date.now()
                     var type = posterData.type.split('/')[1]
                     var poster = timestamp + '.' + type
-                    var newPath = path.join(__dirname, '../../', '/public/upload/' + poster)
+                    var newPath = path.join(__dirname, '../../', '/public/images/' + poster)
 
-                    fs.writeFile(newPath, data, function(err) {
+                    fs.writeFile(newPath, data, function (err) {
                         req.poster = poster
                         callback()
                     })
@@ -98,9 +98,9 @@ exports.isSave = function (req, res) {
             }
 
         },
-         function (callback) {
-            if(req.poster) {
-                movieObj.poster = req.poster
+        function (callback) {
+            if (req.poster) {
+                movieObj.poster = '/images/' + req.poster
             }
 
             callback()
@@ -113,12 +113,12 @@ exports.isSave = function (req, res) {
 
                     if (err) console.log(err)
 
-                    Category.findOne({$or: [{_id: newCategoryId}, {'name': categoryName}]},
+                    Category.findOne({ $or: [{ _id: newCategoryId }, { 'name': categoryName }] },
                         function (err, category) {
                             if (err) console.log(err)
 
                             if (category._id !== oldCategoryId) {
-                                Category.update({_id: oldCategoryId}, {$pull: {'movies': movie._id}},
+                                Category.update({ _id: oldCategoryId }, { $pull: { 'movies': movie._id } },
                                     function (err) {
                                         if (err) {
                                             console.log(err)
@@ -136,29 +136,41 @@ exports.isSave = function (req, res) {
                 })
             }
             else {
+                Movie.findOne({ 'title': movieObj.title }, function (err, movie) {
+                    if (movie !== undefined) {
+                    
+                    res.json({err: '不能重复录入'});
 
-                _movie = new Movie(movieObj)
-                Category.findOne({$or:[{_id:newCategoryId},{'name':categoryName}]}, function (err , category) {
-                    if (category) {
-                        _movie.category = category._id
-                        // console.log('_movie新建有category=======' + JSON.stringify(_movie))
-                        callback(null, _movie, category)
+                
                     }
                     else {
 
-                        callback(null, _movie)
+                        _movie = new Movie(movieObj)
+                        Category.findOne({ $or: [{ _id: newCategoryId }, { 'name': categoryName }] }, function (err, category) {
+                            if (category) {
+                                _movie.category = category._id
+
+                                callback(null, _movie, category)
+
+                            }
+                            else {
+                                callback(null, _movie, category || undefined)
+                            }
+                        })
                     }
                 })
 
+
+
             }
         },
-        function (_movie,category) {
-
-            if (category) {
+        function (_movie, category) {
+            if (category !== undefined) {
                 _movie.save(function (err, movie) {
                     if (err) {
                         console.log(err)
                     }
+                    category.movies = category.movies || [];
                     category.movies.push(movie)
                     category.save(function (err) {
                         if (err) {
@@ -196,8 +208,8 @@ exports.list = function (req, res) {
 
     Movie
         .find({})
-        .populate('category','name')
-        .exec(function (err , movies) {
+        .populate('category', 'name')
+        .exec(function (err, movies) {
             if (err) {
                 console.log(err)
             }
@@ -217,16 +229,15 @@ exports.del = function (req, res) {
 
 
     if (id) {
-        Movie.findById(id,function (err, movie) {
+        Movie.findById(id, function (err, movie) {
+            res.send(200)
             var categoryId = movie.category
-            Category.update({_id: categoryId}, {$pull: {'movies': id}}, function (err) {
-                if (err) {console.log(err)}
-                Movie.remove({_id: id}, function (err) {
+            Category.update({ _id: categoryId }, { $pull: { 'movies': id } }, function (err) {
+                if (err) { console.log(err) }
+                Movie.remove({ _id: id }, function (err) {
                     if (err) {
                         console.log(err)
                     }
-
-                    res.redirect('/admin/movie/list')  //重定向页面
 
                 })
             })

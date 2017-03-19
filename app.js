@@ -14,7 +14,6 @@ var app = express()
 
 app.set('views','./app/views/pages')
 app.set('view engine','jade')
-app.use(bodyParser.urlencoded({ extended: true}))
 app.use(cookieParser());
 app.use(session({
     secret: 'movie',

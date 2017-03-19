@@ -24,9 +24,10 @@ exports.index = function (req, res) {
 }
 
 exports.search = function (req, res) {
+    let limit = 2;
     var catId = req.query.cate
-    var page = parseInt(req.query.p, 10) || 0
-    var index = page * 2
+    var page = parseInt(req.query.p) || 0
+    var index = page * limit
     var movieName = req.query.movieName
     if ( catId ) {
         Category
@@ -46,7 +47,7 @@ exports.search = function (req, res) {
                     title: '查询结果',
                     categoryName: category.name,
                     query: 'cat=' + catId,
-                    movies: movies.slice(index, index + 2),
+                    movies: movies.slice(index, index + limit),
                     totalPage: Math.ceil(movies.length / 2),
                     currentPage: (page + 1)
                 })
@@ -54,21 +55,31 @@ exports.search = function (req, res) {
             })
     }
     else {
-
+        console.log(`search =>>>>>>>>>>>>>`);
         Movie
             .find({'title': new RegExp(movieName + '.*', 'i')})
             .populate('category','name')
             .exec(function ( err, movies) {
-
+                
                 if (err) console.log(err)
+                console.log(movies.length);
 
-                if (movies) {
+                if (movies.length > 0) {
                     res.render('search', {
                         title: '查询结果',
-                        movies: movies,
-                        categoryName: movies[0].category.name,
-                        query: 'title=' + movieName,
-                        totalPage: Math.ceil(movies.length / 2),
+                        categoryName: '匹配结果 ',
+                        movies: movies.slice(index, index+limit),
+                        query: 'movieName=' + movieName,
+                        totalPage: Math.ceil(movies.length / limit),
+                        currentPage: (page + 1)
+                    })
+                } else {
+                    res.render('search', {
+                        title: '查询结果',
+                        movies: '',
+                        categoryName: '匹配结果 ',
+                        query: 'movieName=' + '',
+                        totalPage: Math.ceil(movies.length / limit),
                         currentPage: (page + 1)
                     })
                 }

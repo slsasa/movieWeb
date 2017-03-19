@@ -3,7 +3,7 @@ extends ../layout
 block content
 	.container
 		.row
-			form.form-horizontal(method="post",action="/admin/movie",enctype='multipart/form-data')
+			form.form-horizontal(method="post",action="/admin/movie", enctype='multipart/form-data')
 				.form-group
 					label.col-sm-2.control-label 豆瓣同步
 					.col-sm-10
@@ -61,6 +61,18 @@ block content
 						input#inputSummary.form-control(type="text",name="movie[summary]",value=movie.summary)
 				.form-group
 					.col-sm-offset-2.col-sm-10
-					button.btn.btn-default(type="submit") 录入
+					button.btn.btn-default(type="submit",data-toggle="modal", data-target="#failModal") 录入
 
+
+	#failModal.modal.fade(style="display=none")
+		.modal-dialog
+			.modal-content
+				.modal-header
+					button.close(type="button",data-dismiss="modal") &times;
+					h4.modal-title Error
+				.modal-body
+					div 录入失败，该电影数据已经存在，请载入更新页面
+				.modal-footer
+					button.btn.btn-default(type="button", data-dismiss="modal") 关闭
+				
 	script(src="/js/admin.js")

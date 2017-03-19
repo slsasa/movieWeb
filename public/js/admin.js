@@ -9,12 +9,19 @@ $(function() {
 			url: '/admin/movie/list?id=' + id
 		})
 		.done(function(results){
-			if (results.success === 1 ) {
-				if (tr.length > 0) {
-					tr.remove();
-				}
+			if (results === 'OK' ) {
+				window.location.reload();
+				// if (tr.length > 0) {
+				// 	tr.remove();
+				// }
 			}
 		})
+	})
+
+
+
+	$('.close').click(function () {
+		window.location.reload();
 	})
 
 	$('#douban').blur(function() {
@@ -43,13 +50,14 @@ $(function() {
 	})
 
 	var $radio = $("input[type='radio']:checked");//获取选中的选项
-	var val = $radio.val();//获取选中的选项的值value
-	if (val.length > 0) {
-
+	var val = $radio.val();//获取选中的选项的值value\
+	if (!val || val.length > 0) {
 		$('#inputCategory').attr({
 			type: 'hidden'
 		})
 	}
+
+
 })
 
 
