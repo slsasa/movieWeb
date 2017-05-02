@@ -1,15 +1,39 @@
-var express = require('express')
+let express = require('express')
 const path = require('path')
-var logger = require('morgan')
-var bodyParser = require('body-parser')
-var cookieParser = require('cookie-parser')
-var session = require('express-session')
-var mongoose = require('mongoose')
-var dbUrl = 'mongodb://localhost/movieTest'
+let logger = require('morgan')
+let bodyParser = require('body-parser')
+let cookieParser = require('cookie-parser')
+let fs = require('fs')
+let session = require('express-session')
+let mongoose = require('mongoose')
+let dbUrl = 'mongodb://localhost/movieTest'
 mongoose.connect(dbUrl)
-var mongoStore = require('connect-mongo')(session)
-var port = process.env.PORT || 3000
-var app = express()
+
+//models loading
+let models_path = __dirname + '/app/models'
+let walk = function(path) {
+    fs
+        .readdirSync(path)
+        .forEach(function(file) {
+            let newPath = path + '/' +  file
+            let stat = fs.statSync(newPath)
+
+            if (stat.isFile()) {
+                if(/(.*)\.(js|coffee)/.test(file)) {
+                    require(newPath)
+                }
+            }
+            else if (stat.isDirectory()) {
+                    walk(newPath)
+            }
+        })
+}
+
+walk(models_path)
+
+let mongoStore = require('connect-mongo')(session)
+let port = process.env.PORT || 3000
+let app = express()
 
 
 app.set('views','./app/views/pages')

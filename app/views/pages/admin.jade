@@ -1,7 +1,7 @@
 extends ../layout
 
 block content
-	.container
+	.containeNr
 		.row
 			form.form-horizontal(method="post",action="/admin/movie", enctype='multipart/form-data')
 				.form-group
@@ -64,15 +64,6 @@ block content
 					button.btn.btn-default(type="submit",data-toggle="modal", data-target="#failModal") 录入
 
 
-	#failModal.modal.fade(style="display=none")
-		.modal-dialog
-			.modal-content
-				.modal-header
-					button.close(type="button",data-dismiss="modal") &times;
-					h4.modal-title Error
-				.modal-body
-					div 录入失败，该电影数据已经存在，请载入更新页面
-				.modal-footer
-					button.btn.btn-default(type="button", data-dismiss="modal") 关闭
+	
 				
 	script(src="/js/admin.js")

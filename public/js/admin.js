@@ -45,7 +45,7 @@ $(function() {
 					$('#inputYear').val(data.year)
 					$('#inputSummary').val(data.summary)
 				}
-			})
+			}) 
 		}
 	})
 

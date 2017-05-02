@@ -14,13 +14,13 @@ exports.detail = function (req, res) {
     Movie.findOne({ _id: id })
         .populate('category', 'name')
         .exec(function (err, movie) {
-
+ 
             Comment
                 .find({ movie: id })
                 .populate('from', 'name')
                 .populate('reply.from reply.to', 'name')
                 .exec(function (err, comments) {
-                    console.log('comments' + comments)
+                    Movie.update({_id:id},{$inc:{browse:1}},function(err){console.log(err)})
                     res.render('detail', {
                         title: ' \t',
                         movie: movie,
@@ -137,7 +137,7 @@ exports.isSave = function (req, res) {
             }
             else {
                 Movie.findOne({ 'title': movieObj.title }, function (err, movie) {
-                    if (movie !== undefined) {
+                    if (movie) {
                     
                     res.json({err: '不能重复录入'});
 

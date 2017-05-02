@@ -20,6 +20,10 @@ var MovieSchema = new Schema({
 	summary: String,
 	flash: String,
 	year: Number,
+	browse: {
+		type: Number,
+		default: 0
+	},
 	meta: {			//更新数据时间的纪录
 		createAt: {
 			type: Date,

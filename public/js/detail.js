@@ -1,14 +1,13 @@
 /**
  * Created by sasa on 16/12/7.
  */
-$(function() {
+$(function() { 
     $('.commentReply').click(function (e) {
-
         var target = $(this)
         var toId = target.data('tid')
         var commentId = target.data('cid')
 
-
+ 
         if ( $('#toId').length > 0) {
             $('#toId').val(toId)
 
@@ -16,7 +15,7 @@ $(function() {
 
             $('<input>').attr({
                 id: 'toId',
-                type: 'hidden',
+                type: 'hidden', 
                 name: 'comment[tid]',
                 value: toId
             }).appendTo('#commentForm')

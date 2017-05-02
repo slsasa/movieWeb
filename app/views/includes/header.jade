@@ -1,19 +1,35 @@
 .container
 	.row
 		.page-header.clearfix
-			h1 #{title}
-			.col-md-4
-				small 影视作品分享
-			.col-md-8
-				form(method='GET', action='/search')
-					.input-group.col-sm-4.pull-right
-						input.form-control(type='text', name='movieName')
-						span.input-group-btn
-							button.btn.btn-default(type='submit') 搜素
+			.row
+				h1 #{title}
+				.col-md-4
+					small 影视作品分享
+				.col-md-8
+					form(method='GET', action='/search')
+						.input-group.col-sm-4.pull-right
+							input.form-control(type='text', name='movieName')
+							span.input-group-btn
+								button.btn.btn-default(type='submit') 搜素/更多
+			.row
+				div.span6
+					ul.nav.nav-tabs
+						li.active
+							a(href="/") 首页
+						li
+							a(href="/admin/movie/new") 电影录入	
+						li
+							a(href="/admin/movie/list") 电影列表	
+						li
+							a(href="/admin/category/new") 电影分类新增
+						li
+							a(href="/admin/category/list") 电影分类列表　
+						li
+							a(href="/admin/user/list")	用户列表	
 .navbar.navbar-default.navbar-fixed-bottom
 	.container
 		.navbar-header
-			a.navbar-brand(href="/") 博博科幻影院
+			a.navbar-brand(href="/") 科幻影院
 		if user
 			p.navbar-text.navbar-right
 				span 欢迎您,#{user.name}
